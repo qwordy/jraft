@@ -37,6 +37,7 @@ public class HelloWorldClient {
     /** Say hello to server. */
     public void greet(String name) {
 //        logger.info("Will try to greet " + name + " ...");
+        System.out.println("greet()");
         HelloRequest request = HelloRequest.newBuilder().setName(name).build();
         HelloReply response;
         try {
