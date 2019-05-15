@@ -1,5 +1,7 @@
 package com.jraft;
 
+import com.jraft.util.CmdLineParser;
+
 public class Jraft {
 
     private State state;
@@ -14,6 +16,11 @@ public class Jraft {
     }
 
     public static void main(String[] args) throws Exception {
-        new Jraft();
+        CmdLineParser cmdLineParser = CmdLineParser.getInstance();
+        if (cmdLineParser.parse(args)) {
+            new Jraft();
+        } else {
+            cmdLineParser.showHelp();
+        }
     }
 }
