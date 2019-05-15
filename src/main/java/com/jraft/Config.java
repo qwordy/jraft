@@ -1,5 +1,7 @@
 package com.jraft;
 
+import com.jraft.util.CmdLineParser;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ public class Config {
     private Config() {
         // Load properties
         Properties pro = new Properties();
-        try (FileReader fr = new FileReader("properties")) {
+        try (FileReader fr = new FileReader(CmdLineParser.getInstance().getIdConfFile())) {
             pro.load(fr);
             name = pro.getProperty("name");
             port = Integer.valueOf(pro.getProperty("port"));
@@ -29,7 +31,8 @@ public class Config {
 
         // Load server list
         addrs = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("../servers"))) {
+        try (BufferedReader br = new BufferedReader(
+                new FileReader(CmdLineParser.getInstance().getServersConfFile()))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] terms = line.split("\\s+");
