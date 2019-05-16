@@ -6,10 +6,13 @@ import io.grpc.examples.helloworld.GreeterGrpc;
 import io.grpc.examples.helloworld.HelloReply;
 import io.grpc.examples.helloworld.HelloRequest;
 import io.grpc.stub.StreamObserver;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
 public class HelloWorldServer {
+
+    private static final Logger log = Logger.getLogger(HelloWorldServer.class);
 
     private Server server;
 
@@ -31,9 +34,9 @@ public class HelloWorldServer {
             @Override
             public void run() {
                 // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-                System.err.println("*** shutting down gRPC server since JVM is shutting down");
+                log.warn("*** shutting down gRPC server since JVM is shutting down");
                 HelloWorldServer.this.stop();
-                System.err.println("*** server shut down");
+                log.warn("*** server shut down");
             }
         });
     }

@@ -1,6 +1,7 @@
 package com.jraft;
 
 import com.jraft.util.CmdLineParser;
+import org.apache.log4j.PropertyConfigurator;
 
 public class Jraft {
 
@@ -15,9 +16,21 @@ public class Jraft {
         server.blockUntilShutdown();
     }
 
+    /***
+     * Main function, entrance of Jraft, needs to finish following operations:
+     *
+     * 1. load configuration which is necessary for the services
+     * 2. start local server services, like Election, Log and HeartBeat service
+     * 3. start remote call threads to call services on other remote Nodes
+     *
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         CmdLineParser cmdLineParser = CmdLineParser.getInstance();
         if (cmdLineParser.parse(args)) {
+            String confPath = cmdLineParser.getOptValue("log", "conf/log4j.properties");
+            PropertyConfigurator.configure(confPath);
             new Jraft();
         } else {
             cmdLineParser.showHelp();
