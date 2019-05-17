@@ -12,10 +12,13 @@ public class Config {
 
     private static Config config = new Config();
 
+    // Server name (id)
     private String name;
 
+    // The port on which the server should run
     private int port;
 
+    // Server list
     private List<Addr> addrs;
 
     private Config() {
