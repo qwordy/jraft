@@ -36,7 +36,9 @@ public class CmdLineParser {
         parser = new DefaultParser();
         options = new Options();
         options.addOption("h", "help", false, "Print this usage information");
-        options.addOption("v", "verbose", false, "Print out VERBOSE information" );
+        // options.addOption("v", "verbose", false, "Print out VERBOSE information" );
+        options.addOption("l", "log", true, "Specify log4j.property config file" );
+
         Option id = Option.builder("i")
                 .longOpt("id-conf")
                 .hasArg(true)
@@ -86,7 +88,7 @@ public class CmdLineParser {
 
     public void showHelp() {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp( "java wordcount [OPTION] <FILENAME>", options);
+        formatter.printHelp( "java jar jrpc [OPTION] <FILENAME>", options);
     }
 
     public String getIdConfFile() {
@@ -101,4 +103,8 @@ public class CmdLineParser {
         return optValueMap.get(opt);
     }
 
+    public String getOptValue(String opt, String defaultVal) {
+        String val = optValueMap.get(opt);
+        return val == null ? defaultVal : val;
+    }
 }

@@ -6,10 +6,13 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.examples.helloworld.GreeterGrpc;
 import io.grpc.examples.helloworld.HelloReply;
 import io.grpc.examples.helloworld.HelloRequest;
+import org.apache.log4j.Logger;
 
 import java.util.concurrent.TimeUnit;
 
 public class HelloWorldClient {
+
+    private static final  Logger log = Logger.getLogger(HelloWorldClient.class);
 
     private final ManagedChannel channel;
 
@@ -37,7 +40,7 @@ public class HelloWorldClient {
     /** Say hello to server. */
     public void greet(String name) {
 //        logger.info("Will try to greet " + name + " ...");
-        System.out.println("greet()");
+        log.info("greet()");
         HelloRequest request = HelloRequest.newBuilder().setName(name).build();
         HelloReply response;
         try {
