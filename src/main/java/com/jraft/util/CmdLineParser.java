@@ -38,6 +38,7 @@ public class CmdLineParser {
         options.addOption("h", "help", false, "Print this usage information");
         // options.addOption("v", "verbose", false, "Print out VERBOSE information" );
         options.addOption("l", "log", true, "Specify log4j.property config file" );
+        options.addOption("c", "cache", true, "Specify cache file directory" );
 
         Option id = Option.builder("i")
                 .longOpt("id-conf")
@@ -88,7 +89,7 @@ public class CmdLineParser {
 
     public void showHelp() {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp( "java jar jrpc [OPTION] <FILENAME>", options);
+        formatter.printHelp( "java -jar com.jraf.Jraft [OPTION]", options);
     }
 
     public String getIdConfFile() {

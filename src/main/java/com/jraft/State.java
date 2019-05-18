@@ -2,11 +2,36 @@ package com.jraft;
 
 public class State {
 
-    enum Role {
+    public enum Role {
         Follower, Candidate, Leader
     }
 
-    Role role;
+    volatile Role role;
 
-    int currentTerm;
+    volatile int currentTerm;
+
+    public State() {
+        this(Role.Follower, 0);
+    }
+
+    public State(Role role, int currentTerm) {
+        this.role =role;
+        this.currentTerm = currentTerm;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public int getCurrentTerm() {
+        return currentTerm;
+    }
+
+    public void setCurrentTerm(int currentTerm) {
+        this.currentTerm = currentTerm;
+    }
 }
