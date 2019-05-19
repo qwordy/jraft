@@ -1,11 +1,12 @@
 package com.jraft.handler;
 
 import com.jraft.State;
+import com.jraft.pojo.LogEntry;
 import com.jraft.util.Tuple;
 import io.grpc.jraft.RequestVoteRequest;
 
 /**=
- * this class is the handler for vote request mesage
+ * this class is the handler for vote request message
  */
 public class VoteMessageHandler {
 
@@ -31,11 +32,14 @@ public class VoteMessageHandler {
                 }
             }
 
-            if (currentState.getLastLog().getIndex() > request.getLastLogIndex() ||
-                currentState.getLastLog().getTerm() > request.getLastLogTerm()) {
-                return Tuple.getTuple(currentTerm, false);
+            LogEntry lastLogEntry = currentState.getLastLog();
+            if (null != lastLogEntry) {
+                // if last log entry existed
+                if (lastLogEntry.getIndex() > request.getLastLogIndex() ||
+                        lastLogEntry.getTerm() > request.getLastLogTerm()) {
+                    return Tuple.getTuple(currentTerm, false);
+                }
             }
-
             currentState.setVotedFor(request.getCandidateId());
             return Tuple.getTuple(currentTerm, true);
         }
