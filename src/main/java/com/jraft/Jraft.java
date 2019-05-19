@@ -3,17 +3,38 @@ package com.jraft;
 import com.jraft.util.CmdLineParser;
 import org.apache.log4j.PropertyConfigurator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Jraft {
 
     private State state;
 
     private Config config;
 
+    private List<JraftClient> clients;
+
     private Jraft() throws Exception {
         config = Config.instance();
         JraftServer server = new JraftServer(config.getPort());
         server.start();
+        initClients();
+        state = State.instance();
+        state.setConfig(config);
+        state.setClients(clients);
+        state.followerStart();
         server.blockUntilShutdown();
+    }
+
+    /**
+     * Initialize clients
+     */
+    private void initClients() {
+        List<Config.Addr> list = config.getAddrs();
+        clients = new ArrayList<>();
+        for (Config.Addr addr : list) {
+            clients.add(new JraftClient(addr.host, addr.port));
+        }
     }
 
     /***

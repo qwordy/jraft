@@ -1,22 +1,100 @@
 package com.jraft;
 
+import org.apache.log4j.Logger;
+
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 public class State {
+
+    private static final Logger logger = Logger.getLogger(State.class);
 
     public enum Role {
         Follower, Candidate, Leader
     }
 
-    volatile Role role;
+    private Role role;
 
-    volatile int currentTerm;
+    /**
+     * Latest term server has seen (initialized to 0
+     * on first boot, increases monotonically)
+     */
+    private int currentTerm;
 
-    public State() {
+    /**
+     * candidateId that received vote in current term (or null if none)
+     */
+    private String votedFor;
+
+    /**
+     * Log entries; each entry contains command
+     * for state machine, and term when entry
+     * was received by leader (first index is 1)
+     */
+    private List<String> log;
+
+    /**
+     * Index of highest log entry known to be
+     * committed (initialized to 0, increases
+     * monotonically)
+     */
+    private int commitIndex;
+
+    /**
+     * Index of highest log entry applied to state
+     * machine (initialized to 0, increases
+     * monotonically)
+     */
+    private int lastApplied;
+
+    private Config config;
+
+    private List<JraftClient> clients;
+
+    private ScheduledFuture<?> followerFuture;
+
+    private static State state = new State();
+
+    private State() {
         this(Role.Follower, 0);
     }
 
-    public State(Role role, int currentTerm) {
+    private State(Role role, int currentTerm) {
         this.role =role;
         this.currentTerm = currentTerm;
+    }
+
+    public static State instance() {
+        return state;
+    }
+
+    /**
+     * Schedule follower future task (timeout, switch role to candidate)
+     */
+    public void followerStart() {
+        if (followerFuture != null) {
+            followerFuture.cancel(false);
+        }
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        followerFuture = scheduler.schedule(() -> {
+            logger.info("Follower timeout");
+            role = Role.Candidate;
+            candidateStart();
+        }, Config.electionTimeout, TimeUnit.SECONDS);
+    }
+
+    public void candidateStart() {
+        currentTerm++;
+        // TODO Vote for self
+        // TODO Reset election timer
+        for (JraftClient client : clients) {
+            // TODO 0, 0
+            client.requestVote(currentTerm, config.getName(), 0, 0);
+            logger.info("requestVote done");
+        }
     }
 
     public Role getRole() {
@@ -33,5 +111,61 @@ public class State {
 
     public void setCurrentTerm(int currentTerm) {
         this.currentTerm = currentTerm;
+    }
+
+    public String getVotedFor() {
+        return votedFor;
+    }
+
+    public void setVotedFor(String votedFor) {
+        this.votedFor = votedFor;
+    }
+
+    public List<String> getLog() {
+        return log;
+    }
+
+    public void setLog(List<String> log) {
+        this.log = log;
+    }
+
+    public int getCommitIndex() {
+        return commitIndex;
+    }
+
+    public void setCommitIndex(int commitIndex) {
+        this.commitIndex = commitIndex;
+    }
+
+    public int getLastApplied() {
+        return lastApplied;
+    }
+
+    public void setLastApplied(int lastApplied) {
+        this.lastApplied = lastApplied;
+    }
+
+    public List<JraftClient> getClients() {
+        return clients;
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
+    }
+
+    public void setClients(List<JraftClient> clients) {
+        this.clients = clients;
+    }
+
+    public ScheduledFuture<?> getFollowerFuture() {
+        return followerFuture;
+    }
+
+    public void setFollowerFuture(ScheduledFuture<?> followerFuture) {
+        this.followerFuture = followerFuture;
     }
 }
