@@ -1,5 +1,6 @@
 package com.jraft;
 
+import com.jraft.pojo.LogEntry;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class State {
      * for state machine, and term when entry
      * was received by leader (first index is 1)
      */
-    private List<String> log;
+    private List<LogEntry> log;
 
     /**
      * Index of highest log entry known to be
@@ -49,6 +50,12 @@ public class State {
      * monotonically)
      */
     private int lastApplied;
+
+    /**
+     * Index of highest log entry applied to state
+     * machine (initialized to 0, increases
+     * monotonically)
+     */
 
     private Config config;
 
@@ -121,12 +128,24 @@ public class State {
         this.votedFor = votedFor;
     }
 
-    public List<String> getLog() {
+    public List<LogEntry> getLog() {
         return log;
     }
 
-    public void setLog(List<String> log) {
-        this.log = log;
+    public void appendLogs(List<LogEntry> logEntries) {
+        this.log.addAll(logEntries);
+    }
+
+    public void appendLog(LogEntry logEntry) {
+        this.log.add(logEntry);
+    }
+
+    public LogEntry getLastLog() {
+        if (log.isEmpty()) {
+            return null;
+        } else {
+            return log.get(log.size() - 1);
+        }
     }
 
     public int getCommitIndex() {
