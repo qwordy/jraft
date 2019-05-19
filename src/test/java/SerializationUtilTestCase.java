@@ -12,7 +12,7 @@ public class SerializationUtilTestCase extends TestCase {
     @Before
     @Override
     public void setUp() throws Exception {
-
+        super.setUp();
     }
 
 
@@ -24,7 +24,7 @@ public class SerializationUtilTestCase extends TestCase {
 
     @Test
     public void testSerializeAndDeserialize() throws Exception {
-        State state = new State();
+        State state = State.instance();
         state.setRole(State.Role.Candidate);
         state.setCurrentTerm(3);
         byte[] stateBytes = SerializationUtils.serialize(state);
@@ -36,7 +36,7 @@ public class SerializationUtilTestCase extends TestCase {
     @Test
     public void testFileSerializeAndDeserialize() throws Exception {
         String serializedFileName = "/tmp/state.dat";
-        State state = new State();
+        State state = State.instance();
         State stateNew;
 
         // one

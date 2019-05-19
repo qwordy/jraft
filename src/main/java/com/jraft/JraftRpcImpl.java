@@ -1,5 +1,7 @@
 package com.jraft;
 
+import com.jraft.handler.VoteMessageHandler;
+import com.jraft.util.Tuple;
 import io.grpc.jraft.*;
 import io.grpc.stub.StreamObserver;
 import org.apache.log4j.Logger;
@@ -8,12 +10,16 @@ public class JraftRpcImpl extends JraftGrpc.JraftImplBase {
 
     private static final Logger logger = Logger.getLogger(JraftRpcImpl.class);
 
+    private final VoteMessageHandler voteMessageHandler = new VoteMessageHandler();
+
     @Override
     public void requestVote(RequestVoteRequest request, StreamObserver<RequestVoteReply> responseObserver) {
-        logger.info("Server receives requestVote request");
         // TODO
-        int term = 0;
-        boolean voteGranted = false;
+        Tuple.Tuple2<Integer, Boolean> voteHandlerResult = voteMessageHandler.votedFor(request);
+        int term = voteHandlerResult.getFirst();
+        boolean voteGranted = voteHandlerResult.getSecond();
+        logger.info(String.format("Server receives requestVote request from candidate %s, vote result" +
+                "  term %d, vote granted %b", request.getCandidateId(), term, voteGranted));
         if (voteGranted) {
             // Reschedule follower future task
             State.instance().followerStart();
