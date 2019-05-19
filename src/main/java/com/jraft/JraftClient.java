@@ -3,11 +3,14 @@ package com.jraft;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.jraft.*;
+import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class JraftClient {
+
+    private static final Logger logger = Logger.getLogger(JraftClient.class);
 
     private final ManagedChannel channel;
 
@@ -31,6 +34,7 @@ public class JraftClient {
      * @return RequestVoteReply
      */
     public RequestVoteReply requestVote(int term, String candidateId, int lastLogIndex, int lastLogTerm) {
+        logger.info(String.format("requestVote %d %s %d %d", term, candidateId, lastLogIndex, lastLogTerm));
         RequestVoteRequest request = RequestVoteRequest.newBuilder()
                 .setTerm(term)
                 .setCandidateId(candidateId)
