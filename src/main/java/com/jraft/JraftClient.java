@@ -16,9 +16,13 @@ public class JraftClient {
 
     private final JraftGrpc.JraftBlockingStub blockingStub;
 
+    // Async stub
+    private final JraftGrpc.JraftStub stub;
+
     public JraftClient(String host, int port) {
         channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
         blockingStub = JraftGrpc.newBlockingStub(channel);
+        stub = JraftGrpc.newStub(channel);
     }
 
     public void shutdown() throws InterruptedException {

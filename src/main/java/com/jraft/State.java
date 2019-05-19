@@ -54,13 +54,15 @@ public class State {
 
     private List<JraftClient> clients;
 
+    private ScheduledFuture<?> followerFuture;
+
     private static State state = new State();
 
-    public State() {
+    private State() {
         this(Role.Follower, 0);
     }
 
-    public State(Role role, int currentTerm) {
+    private State(Role role, int currentTerm) {
         this.role =role;
         this.currentTerm = currentTerm;
     }
@@ -69,9 +71,15 @@ public class State {
         return state;
     }
 
+    /**
+     * Schedule follower future task (timeout, switch role to candidate)
+     */
     public void followerStart() {
+        if (followerFuture != null) {
+            followerFuture.cancel(false);
+        }
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        ScheduledFuture<?> future = scheduler.schedule(() -> {
+        followerFuture = scheduler.schedule(() -> {
             logger.info("Follower timeout");
             role = Role.Candidate;
             candidateStart();
@@ -151,5 +159,13 @@ public class State {
 
     public void setClients(List<JraftClient> clients) {
         this.clients = clients;
+    }
+
+    public ScheduledFuture<?> getFollowerFuture() {
+        return followerFuture;
+    }
+
+    public void setFollowerFuture(ScheduledFuture<?> followerFuture) {
+        this.followerFuture = followerFuture;
     }
 }

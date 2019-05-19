@@ -19,7 +19,7 @@ public class Jraft {
         JraftServer server = new JraftServer(config.getPort());
         server.start();
         initClients();
-        state = new State();
+        state = State.instance();
         state.setConfig(config);
         state.setClients(clients);
         state.followerStart();
